@@ -20,7 +20,7 @@ puri-1.5.1.tar.gz \
 parenscript-20090216.tar.gz \
 moptilities-0.3.13.tar.gz \
 metatilities-base-0.6.6.tar.gz \
-metatilities-0.6.18.tar.gz \ 
+metatilities-0.6.18.tar.gz \
 metabang-bind-0.7.4.tar.gz \
 md5-1.8.5.tar.gz \
 hunchentoot-1.0.0.tar.gz \
