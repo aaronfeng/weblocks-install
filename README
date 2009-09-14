@@ -1,1 +1,8 @@
-Weblocks install
+A self contained weblocks installation script for weblocks 0.8.3
+
+* Usage:
+  bash install-weblocks.sh your-project-name
+
+* Contact:
+  aaron.feng@gmail.com
+  http://twitter.com/aaronfeng
