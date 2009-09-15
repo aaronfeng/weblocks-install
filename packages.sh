@@ -45,5 +45,9 @@ babel-0.3.0.tar.gz \
 alexandria-2008-07-29.tar.gz \
 anaphora-0.9.3.tar.gz \
 asdf-system-connections-0.1.tar.gz \
-slime-2009-09-12.tar.gz
+slime-2009-09-12.tar.gz \
+linedit-0.16.1.tar.gz \
+osicat-0.6.0.tar.gz \
+terminfo-1.3.tar.gz \
+uffi-1.6.2.tar.gz
 " 
