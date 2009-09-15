@@ -1,4 +1,8 @@
-A self contained weblocks installation script for weblocks 0.8.3
+A self contained weblocks installation script for weblocks 0.8.3.
+
+The script tries to be as idempotent as possible during the install, but
+more work is probably required.  It should be consider safe to repeat the
+script on an already created project.
 
 * Usage:
   - Download and install all weblocks dependencies into the project:
@@ -11,8 +15,19 @@ A self contained weblocks installation script for weblocks 0.8.3
     script/server
 
 * Note:
-  The script tries to be as idempotent as possible during the install, but
-  more work is probably required.
+
+* Release Notes:
+  - All dependencies are required by weblocks except for:
+
+    slime-2009-09-12.tar.gz
+    linedit-0.16.1.tar.gz
+    osicat-0.6.0.tar.gz
+    terminfo-1.3.tar.gz
+    uffi-1.6.2.tar.gz
+
+ - Removed version checking of osicat in linedit-0.16.1.
+   Apparently *osicat-version* symbol is no longer available.
+   Version checking should probably done at the asdf level.
 
 * Contact:
   aaron.feng@gmail.com

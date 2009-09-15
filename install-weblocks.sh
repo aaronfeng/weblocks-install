@@ -58,7 +58,7 @@ test -d $DATA              || mkdir $DATA
 INIT_SESSION="$SRC/init-session.lisp"
 if [ ! -e "$INIT_SESSION" ]
 then
-  cat > $INIT_SESSION <<EOF
+  cat > "$INIT_SESSION" <<EOF
 (in-package :$PROJECT_NAME)
 
 ;; Define callback function to initialize new sessions
@@ -73,7 +73,7 @@ fi
 STORES="$CONF/stores.lisp"
 if [ ! -e "$STORES" ]
 then
-  cat > $STORES <<EOF
+  cat > "$STORES" <<EOF
 (in-package :$PROJECT_NAME)
 
 ;;; Multiple stores may be defined. The last defined store will be the
@@ -87,7 +87,7 @@ fi
 PROJECT_LISP="$PROJECT_PATH/$PROJECT_NAME.lisp"
 if [ ! -e "$PROJECT_LISP" ]
 then
-  cat > $PROJECT_LISP <<EOF
+  cat > "$PROJECT_LISP" <<EOF
 (defpackage #:$PROJECT_NAME
   (:use :cl :weblocks
         :f-underscore :anaphora)
@@ -160,6 +160,7 @@ then
   cat > "$SBCLRC" <<EOF
 (require 'asdf)
 (require 'sb-posix)
+(require :sb-aclrepl)
 
 (defmacro loadsys (sys)
   \`(asdf:oos 'asdf:load-op (quote ,sys)))
@@ -178,19 +179,17 @@ then
 (loadsys :$PROJECT_NAME)
 ($PROJECT_NAME:start-$PROJECT_NAME :port 4444)
 
-;;; fix me
-;;; this might need additional libs
-;(if (member "--no-linedit" sb-ext:*posix-argv* :test 'equal)
-;    (setf sb-ext:*posix-argv* 
-;    (remove "--no-linedit" sb-ext:*posix-argv* :test 'equal))
-;    (when (interactive-stream-p *terminal-io*)
-;      (require :sb-aclrepl)
-;      (require :linedit)
-;      (funcall (intern "INSTALL-REPL" :linedit) :wrap-current t)))
+(if (member "--no-linedit" sb-ext:*posix-argv* :test 'equal)
+    (setf sb-ext:*posix-argv* 
+    (remove "--no-linedit" sb-ext:*posix-argv* :test 'equal))
+    (when (interactive-stream-p *terminal-io*)
+      (require :sb-aclrepl)
+      (require :linedit)
+      (funcall (intern "INSTALL-REPL" :linedit) :wrap-current t)))
 EOF
 fi
 
-RUN_SCRIPT="$SCRIPT/run-$PROJECT_NAME"
+RUN_SCRIPT="$SCRIPT/server"
 if [ ! -e "$RUN_SCRIPT" ]
 then
   cat > "$RUN_SCRIPT" <<EOF
@@ -200,16 +199,16 @@ echo "DELETING old $PROJECT_NAME fasl"
 find \$PROJECT_ROOT/src  -iname \*.fasl -delete
 sbcl --userinit \$PROJECT_ROOT/$PROJECT_NAME.sbclrc \$PROJECT_ROOT
 EOF
-  chmod 744 $RUN_SCRIPT
+  chmod 744 "$RUN_SCRIPT"
 fi
 
 for PACKAGE in $PACKAGES; do
-  if [ ! -f $LIB_SRC/$PACKAGE ] 
+  if [ ! -f "$LIB_SRC/$PACKAGE" ] 
   then
     echo -e "\033[33m Downloading $PACKAGE \033[0m"
-    curl -C - -o $LIB_SRC/$PACKAGE -L "$PACKAGES_URL/$PACKAGE"
+    curl -C - -o "$LIB_SRC/$PACKAGE" -L "$PACKAGES_URL/$PACKAGE"
     echo -e "\033[32m Sucessfully downloaded $PACKAGE \033[0m"
-    tar -xvf $LIB_SRC/$PACKAGE -C $LIB_SRC
+    tar -xvf "$LIB_SRC/$PACKAGE" -C "$LIB_SRC"
   else
     echo -e "\033[31m $PACKAGE already exists.  Skipping. \033[0m"
   fi
@@ -217,9 +216,9 @@ done
 
 if [ ! -d "$PROJECT_PATH/pub" ] 
 then
-cp -r $WEBLOCKS_PUB $PROJECT_PATH
+cp -r "$WEBLOCKS_PUB" "$PROJECT_PATH"
 fi
 
-cd $LIB_SYSTEMS
+cd "$LIB_SYSTEMS"
 ln -sf ../src/*/*.asd .
 cd -
