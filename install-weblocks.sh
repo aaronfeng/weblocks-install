@@ -221,4 +221,6 @@ fi
 
 cd "$LIB_SYSTEMS"
 ln -sf ../src/*/*.asd .
+rm weblocks-demo.asd
+rm weblocks-test.asd
 cd -
