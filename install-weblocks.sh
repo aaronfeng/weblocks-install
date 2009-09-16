@@ -166,6 +166,7 @@ then
   \`(asdf:oos 'asdf:load-op (quote ,sys)))
 
 (defvar *project-root* (pathname (nth 1 *posix-argv*)))
+(defvar *port* (parse-integer (nth 2 *posix-argv*)))
 (defvar *project-lib-systems* (merge-pathnames #p"lib/systems/" *project-root*))
 
 (push *project-root* asdf:*central-registry*)
@@ -177,15 +178,19 @@ then
 (swank:create-server :dont-close t)
 
 (loadsys :$PROJECT_NAME)
-($PROJECT_NAME:start-$PROJECT_NAME :port 4444)
+($PROJECT_NAME:start-$PROJECT_NAME :port *port*)
 
 (if (member "--no-linedit" sb-ext:*posix-argv* :test 'equal)
-    (setf sb-ext:*posix-argv* 
-    (remove "--no-linedit" sb-ext:*posix-argv* :test 'equal))
+    (setf sb-ext:*posix-argv* (remove "--no-linedit" sb-ext:*posix-argv* :test 'equal))
     (when (interactive-stream-p *terminal-io*)
       (require :sb-aclrepl)
       (require :linedit)
       (funcall (intern "INSTALL-REPL" :linedit) :wrap-current t)))
+
+(format t "~%Welcome to Weblocks version 0.8.3 running on port ~S" *port*)
+(format t "~%Swank is running on port 4005")
+(format t "~%Use (sb-ext:quit) to exit REPL")
+(in-package $PROJECT_NAME)
 EOF
 fi
 
@@ -197,7 +202,7 @@ PROJECT_ROOT=\`dirname \$0\`/../
 echo "Project root: \$PROJECT_ROOT"
 echo "DELETING old $PROJECT_NAME fasl"
 find \$PROJECT_ROOT/src  -iname \*.fasl -delete
-sbcl --userinit \$PROJECT_ROOT/$PROJECT_NAME.sbclrc \$PROJECT_ROOT
+sbcl --userinit \$PROJECT_ROOT/$PROJECT_NAME.sbclrc \$PROJECT_ROOT 5555
 EOF
   chmod 744 "$RUN_SCRIPT"
 fi

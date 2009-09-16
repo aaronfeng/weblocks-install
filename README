@@ -14,8 +14,6 @@ script on an already created project.
     cd your-project-name
     script/server
 
-* Note:
-
 * Release Notes:
   - All dependencies are required by weblocks except for:
 
@@ -33,3 +31,10 @@ script on an already created project.
 * Contact:
   aaron.feng@gmail.com
   http://twitter.com/aaronfeng
+
+
+
+
+* TODO:
+  - check to see if threads are enabled for sbcl before compiling
+  - add sbcl compile script for osx
