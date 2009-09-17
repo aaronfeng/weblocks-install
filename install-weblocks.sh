@@ -4,7 +4,9 @@
 # http://twitter.com/aaronfeng
 
 set -e
-set -x
+
+# enable for debugging
+# set -x
 
 if [ -z $1 ]
 then
@@ -31,17 +33,31 @@ fi
 
 set -u
 
-if ! hash sbcl 2>/dev/null 
-then
-  echo -e "\033[1m Unable to find sbcl on the path.  Exiting. \033[0m"
-  exit 1
-fi
-
 if ! hash curl 2>/dev/null 
 then
   echo -e "\033[1m Unable to find curl on the path.  Exiting. \033[0m"
   exit 1
+else
+  echo -e "\033[32m Found curl on the path. \033[0m"
 fi
+
+if ! hash sbcl 2>/dev/null 
+then
+  echo -e "\033[1m Unable to find sbcl on the path.  Exiting. \033[0m"
+  exit 1
+else
+  echo -e "\033[32m Found sbcl on the path. \033[0m"
+fi
+
+if [ -z $(echo "(null (member :sb-thread *features*))" | sbcl | grep NIL) ]
+then
+  echo "SBCL thread is not enabled.  Please compile SBCL thread support."
+  exit 1
+else
+  echo -e "\033[32m sbcl thread is enabled. \033[0m"
+fi
+
+echo ""
 
 PROJECT_PATH="`dirname $1`/`basename $1`"
 PROJECT_NAME="`basename "$1"`"
@@ -76,6 +92,7 @@ then
     (with-html
       (:strong "Happy Hacking!"))))))
 EOF
+  echo -e "\033[32m Created $INIT_SESSION \033[0m"
 fi
 
 STORES="$CONF/stores.lisp"
@@ -90,6 +107,7 @@ then
   (merge-pathnames (make-pathname :directory '(:relative "data"))
        (asdf-system-directory :$PROJECT_NAME)))
 EOF
+  echo -e "\033[32m Created $STORES \033[0m"
 fi
 
 PROJECT_LISP="$PROJECT_PATH/$PROJECT_NAME.lisp"
@@ -132,6 +150,7 @@ then
   (stop-webapp '$PROJECT_NAME)
   (stop-weblocks))
 EOF
+  echo -e "\033[32m Created $PROJECT_LISP \033[0m"
 fi
 
 ASD="$PROJECT_PATH/$PROJECT_NAME.asd"
@@ -159,6 +178,7 @@ then
       :components ((:file "init-session"))
       :depends-on ("$PROJECT_NAME" conf))))
 EOF
+  echo -e "\033[32m Created $ASD \033[0m"
 fi
 
   
@@ -200,6 +220,7 @@ then
 (format t "~%Use (sb-ext:quit) to exit REPL")
 (in-package $PROJECT_NAME)
 EOF
+  echo -e "\033[32m Created $SBCLRC \033[0m"
 fi
 
 RUN_SCRIPT="$SCRIPT/server"
@@ -213,27 +234,36 @@ find \$PROJECT_ROOT/src  -iname \*.fasl -delete
 sbcl --userinit \$PROJECT_ROOT/$PROJECT_NAME.sbclrc \$PROJECT_ROOT 5555
 EOF
   chmod 744 "$RUN_SCRIPT"
+  echo -e "\033[32m Created $RUN_SCRIPT \033[0m"
 fi
 
 for PACKAGE in $PACKAGES; do
   if [ ! -f "$LIB_SRC/$PACKAGE" ] 
   then
     echo -e "\033[33m Downloading $PACKAGE \033[0m"
-    curl -C - -o "$LIB_SRC/$PACKAGE" -L "$PACKAGES_URL/$PACKAGE"
-    echo -e "\033[32m Sucessfully downloaded $PACKAGE \033[0m"
-    tar -xvf "$LIB_SRC/$PACKAGE" -C "$LIB_SRC"
+    curl -C - -o "$LIB_SRC/$PACKAGE" -L "$PACKAGES_URL/$PACKAGE" > /dev/null 2>&1
+    
+    echo -e "\033[33m Unpacking $PACKAGE \033[0m"
+    tar -xvf "$LIB_SRC/$PACKAGE" -C "$LIB_SRC" > /dev/null
+    echo ""
   else
-    echo -e "\033[31m $PACKAGE already exists.  Skipping. \033[0m"
+    echo -e "\033[31m Skipping: $PACKAGE already exists. \033[0m"
   fi
 done
 
 if [ ! -d "$PROJECT_PATH/pub" ] 
 then
-cp -r "$WEBLOCKS_PUB" "$PROJECT_PATH"
+  cp -r "$WEBLOCKS_PUB" "$PROJECT_PATH"
 fi
 
 cd "$LIB_SYSTEMS"
 ln -sf ../src/*/*.asd .
 rm weblocks-demo.asd
 rm weblocks-test.asd
-cd -
+cd - > /dev/null
+
+echo ""
+echo -e "\033[32m Sucessfully created $PROJECT_NAME project.\033[0m"
+echo -e "\033[32m If anything failed during the installation, it's safe to rerun this script on the same project again.\033[0m"
+echo ""
+echo -e "\033[32m Happy Hacking! \033[0m"
