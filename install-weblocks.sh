@@ -13,7 +13,9 @@ then
   exit 1
 fi
 
-source packages.sh
+INSTALL_SCRIPT="`dirname "$0"`"
+
+source "$INSTALL_SCRIPT/packages.sh"
 
 if [ -z "$PACKAGES" ]; then
   echo "\$PACKAGES not set: You must specify packages to install with weblocks. "
@@ -29,8 +31,20 @@ fi
 
 set -u
 
-PROJECT_PATH=`dirname $1`/`basename $1`
-PROJECT_NAME=`basename $1`
+if ! hash sbcl 2>/dev/null 
+then
+  echo -e "\033[1m Unable to find sbcl on the path.  Exiting. \033[0m"
+  exit 1
+fi
+
+if ! hash curl 2>/dev/null 
+then
+  echo -e "\033[1m Unable to find curl on the path.  Exiting. \033[0m"
+  exit 1
+fi
+
+PROJECT_PATH="`dirname $1`/`basename $1`"
+PROJECT_NAME="`basename "$1"`"
 LIB=$PROJECT_PATH/lib
 LIB_SYSTEMS=$LIB/systems
 LIB_SRC=$LIB/src
@@ -39,12 +53,6 @@ SCRIPT=$PROJECT_PATH/script
 CONF=$PROJECT_PATH/conf
 DATA=$PROJECT_PATH/data
 WEBLOCKS_PUB=$LIB_SRC/weblocks-stable/pub
-
-if ! hash sbcl 2>/dev/null 
-then
-  echo -e "\033[1m Unable to find sbcl on the path.  Exiting. \033[0m"
-  exit 1
-fi
 
 test -d $PROJECT_PATH      || mkdir $PROJECT_PATH
 test -d $LIB               || mkdir $LIB
