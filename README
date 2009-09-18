@@ -1,4 +1,4 @@
-A self contained weblocks installation script for weblocks 0.8.3.
+A self contained weblocks installation script for weblocks.
 
 The script tries to be as idempotent as possible during the install, but
 more work is probably required.  It should be consider safe to repeat the
@@ -7,7 +7,13 @@ script on an already created project.
 * Usage:
   - Download and install all weblocks dependencies into the project:
 
+    # install the weblocks stable version
     bash install-weblocks.sh your-project-name
+
+    # or
+
+    # install the weblocks tip version
+    bash install-weblocks.sh your-project-name tip
 
   - Compile and run the project:
 
@@ -28,13 +34,10 @@ script on an already created project.
    Apparently *osicat-version* symbol is no longer available.
    Version checking should probably done at the asdf level.
 
+* TODO:
+  - add sbcl compile script for osx
+  - check to see if weblocks port is being used during install
+
 * Contact:
   aaron.feng@gmail.com
   http://twitter.com/aaronfeng
-
-
-
-
-* TODO:
-  - check to see if threads are enabled for sbcl before compiling
-  - add sbcl compile script for osx

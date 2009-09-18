@@ -10,12 +10,32 @@ set -e
 
 if [ -z $1 ]
 then
-  echo "You must supply a project name "
+  echo -e "\033[31m Usage: $0 project-name stable-or-tip \033[0m"
   echo ""
   exit 1
 fi
 
+PROJECT_PATH="`dirname $1`/`basename $1`"
+PROJECT_NAME="`basename "$1"`"
+LIB=$PROJECT_PATH/lib
+LIB_SYSTEMS=$LIB/systems
+LIB_SRC=$LIB/src
+SRC=$PROJECT_PATH/src
+SCRIPT=$PROJECT_PATH/script
+CONF=$PROJECT_PATH/conf
+DATA=$PROJECT_PATH/data
 INSTALL_SCRIPT="`dirname "$0"`"
+
+WEBLOCKS_PACKAGE_URL="http://cloud.github.com/downloads/aaronfeng/weblocks-install"
+WEBLOCKS_PACKAGE="weblocks-0.8.3.tar.gz"
+WEBLOCKS_PUB=$LIB_SRC/weblocks-stable/pub
+
+if [ -n $2 ] && [ $2 == "tip" ]; then
+  echo "\033[33m Using the latest weblocks-dev \033[0m"
+  WEBLOCKS_PACKAGE_URL="http://bitbucket.org/S11001001/weblocks-dev/get"
+  WEBLOCKS_PACKAGE="tip.tar.gz"
+  WEBLOCKS_PUB=$LIB_SRC/weblocks-dev/pub
+fi
 
 source "$INSTALL_SCRIPT/packages.sh"
 
@@ -58,17 +78,6 @@ else
 fi
 
 echo ""
-
-PROJECT_PATH="`dirname $1`/`basename $1`"
-PROJECT_NAME="`basename "$1"`"
-LIB=$PROJECT_PATH/lib
-LIB_SYSTEMS=$LIB/systems
-LIB_SRC=$LIB/src
-SRC=$PROJECT_PATH/src
-SCRIPT=$PROJECT_PATH/script
-CONF=$PROJECT_PATH/conf
-DATA=$PROJECT_PATH/data
-WEBLOCKS_PUB=$LIB_SRC/weblocks-stable/pub
 
 test -d $PROJECT_PATH      || mkdir $PROJECT_PATH
 test -d $LIB               || mkdir $LIB
@@ -195,6 +204,7 @@ then
 
 (defvar *project-root* (pathname (nth 1 *posix-argv*)))
 (defvar *port* (parse-integer (nth 2 *posix-argv*)))
+(defvar *swank-port* (parse-integer (nth 3 *posix-argv*)))
 (defvar *project-lib-systems* (merge-pathnames #p"lib/systems/" *project-root*))
 
 (push *project-root* asdf:*central-registry*)
@@ -203,7 +213,7 @@ then
 (asdf:operate 'asdf:load-op 'weblocks)
 
 (loadsys :swank)
-(swank:create-server :dont-close t)
+(swank:create-server :dont-close t :port *swank-port*)
 
 (loadsys :$PROJECT_NAME)
 ($PROJECT_NAME:start-$PROJECT_NAME :port *port*)
@@ -216,7 +226,7 @@ then
       (funcall (intern "INSTALL-REPL" :linedit) :wrap-current t)))
 
 (format t "~%Welcome to Weblocks version 0.8.3 running on port ~S" *port*)
-(format t "~%Swank is running on port 4005")
+(format t "~%Swank is running on port ~S" *swank-port*)
 (format t "~%Use (sb-ext:quit) to exit REPL")
 (in-package $PROJECT_NAME)
 EOF
@@ -228,13 +238,28 @@ if [ ! -e "$RUN_SCRIPT" ]
 then
   cat > "$RUN_SCRIPT" <<EOF
 PROJECT_ROOT=\`dirname \$0\`/../
+SWANK_PORT=4005
+WEBLOCKS_PORT=5555
 echo "Project root: \$PROJECT_ROOT"
 echo "DELETING old $PROJECT_NAME fasl"
 find \$PROJECT_ROOT/src  -iname \*.fasl -delete
-sbcl --userinit \$PROJECT_ROOT/$PROJECT_NAME.sbclrc \$PROJECT_ROOT 5555
+sbcl --userinit \$PROJECT_ROOT/$PROJECT_NAME.sbclrc \$PROJECT_ROOT \$WEBLOCKS_PORT \$SWANK_PORT
 EOF
   chmod 744 "$RUN_SCRIPT"
   echo -e "\033[32m Created $RUN_SCRIPT \033[0m"
+fi
+
+
+echo ""
+
+if [ ! -f "$LIB_SRC/$WEBLOCKS_PACKAGE" ] 
+then
+  echo -e "\033[33m Downloading $WEBLOCKS_PACKAGE \033[0m"
+  curl -C - -o "$LIB_SRC/$WEBLOCKS_PACKAGE" -L "$WEBLOCKS_PACKAGE_URL/$WEBLOCKS_PACKAGE" > /dev/null 2>&1
+  echo -e "\033[33m Unpacking $WEBLOCKS_PACKAGE \033[0m"
+  tar -xvf "$LIB_SRC/$WEBLOCKS_PACKAGE" -C "$LIB_SRC" > /dev/null
+else
+  echo -e "\033[31m Skipping: $WEBLOCKS_PACKAGE already exists. \033[0m"
 fi
 
 for PACKAGE in $PACKAGES; do
@@ -256,6 +281,9 @@ then
   cp -r "$WEBLOCKS_PUB" "$PROJECT_PATH"
 fi
 
+echo ""
+echo -e "\033[33m Linking $LIB_SYSTEMS asd files \033[0m"
+
 cd "$LIB_SYSTEMS"
 ln -sf ../src/*/*.asd .
 rm weblocks-demo.asd
@@ -266,4 +294,7 @@ echo ""
 echo -e "\033[32m Sucessfully created $PROJECT_NAME project.\033[0m"
 echo -e "\033[32m If anything failed during the installation, it's safe to rerun this script on the same project again.\033[0m"
 echo ""
+echo -e "\033[32m Execute script/server in $PROJECT_NAME to compile and start up Weblocks.\033[0m"
+echo -e "\033[32m The $PROJECT_NAME project will be running on port 5555 and Swank on 4005 by default.\033[0m"
+echo -e "\033[32m Please update script/server to run on alternate ports.\033[0m"
 echo -e "\033[32m Happy Hacking! \033[0m"

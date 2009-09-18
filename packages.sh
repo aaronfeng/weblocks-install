@@ -4,7 +4,6 @@
 # http://twitter.com/aaronfeng
 PACKAGES_URL="http://cloud.github.com/downloads/aaronfeng/weblocks-install"
 PACKAGES="
-weblocks-0.8.3.tar.gz \
 usocket-0.4.1.tar.gz \
 trivial-timeout-0.1.5.tar.gz \
 trivial-gray-streams-2008-11-02.tar.gz \
