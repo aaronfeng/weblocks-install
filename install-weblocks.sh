@@ -199,9 +199,6 @@ then
 (require 'sb-posix)
 (require :sb-aclrepl)
 
-(defmacro loadsys (sys)
-  \`(asdf:oos 'asdf:load-op (quote ,sys)))
-
 (defvar *project-root* (pathname (nth 1 *posix-argv*)))
 (defvar *port* (parse-integer (nth 2 *posix-argv*)))
 (defvar *swank-port* (parse-integer (nth 3 *posix-argv*)))
@@ -210,14 +207,6 @@ then
 (push *project-root* asdf:*central-registry*)
 (push *project-lib-systems* asdf:*central-registry*)
 
-(asdf:operate 'asdf:load-op 'weblocks)
-
-(loadsys :swank)
-(swank:create-server :dont-close t :port *swank-port*)
-
-(loadsys :$PROJECT_NAME)
-($PROJECT_NAME:start-$PROJECT_NAME :port *port*)
-
 (if (member "--no-linedit" sb-ext:*posix-argv* :test 'equal)
     (setf sb-ext:*posix-argv* (remove "--no-linedit" sb-ext:*posix-argv* :test 'equal))
     (when (interactive-stream-p *terminal-io*)
@@ -225,10 +214,27 @@ then
       (require :linedit)
       (funcall (intern "INSTALL-REPL" :linedit) :wrap-current t)))
 
-(format t "~%Welcome to Weblocks version 0.8.3 running on port ~S" *port*)
-(format t "~%Swank is running on port ~S" *swank-port*)
-(format t "~%Use (sb-ext:quit) to exit REPL")
+(asdf:operate 'asdf:load-op 'weblocks)
+
+(asdf:oos 'asdf:load-op 'swank)
+(swank:create-server :dont-close t :port *swank-port*)
+
+(asdf:oos 'asdf:load-op '$PROJECT_NAME)
+($PROJECT_NAME:start-$PROJECT_NAME :port *port*)
+
+;; sending "\033[2J" to clear screen
+(format t "~C[2J~%" #\Esc)
+
+(format t "Welcome to weblocks~%")
+(format t "Weblocks is running on port ~S~%" *port*)
+(format t "Swank is running on port ~S~%" *swank-port*)
+(format t "Use (quit) to exit REPL")
 (in-package $PROJECT_NAME)
+
+(defmacro loadsys (sys)
+  \`(asdf:oos 'asdf:load-op (quote ,sys)))
+
+(defun quit () (sb-ext:quit))
 EOF
   echo -e "\033[32m Created $SBCLRC \033[0m"
 fi

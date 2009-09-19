@@ -1,29 +1,37 @@
-A self contained weblocks installation script for weblocks.
+An idempotent self contained weblocks installation script for weblocks.
+The installation process will download stable version of weblocks (0.8.3),
+but an optional tip argument can be supplied to download the current
+development version.
 
-The script tries to be as idempotent as possible during the install, but
-more work is probably required.  It should be consider safe to repeat the
+Swank is enabled by default, so one can connect to it from Emacs using
+Slime for interactive or remote development.
+
+The script attempts to be as idempotent as possible during the install, but
+more work might be required.  It should be consider safe to repeat the
 script on an already created project.
+
+* Prerequsite:
+  sbcl (thread enabled, not enabled by default on OSX), curl, tar
 
 * Usage:
   - Download and install all weblocks dependencies into the project:
 
     # install the weblocks stable version
-    bash install-weblocks.sh your-project-name
+    bash install-weblocks.sh your-project-name-with-path
 
     # or
 
-    # install the weblocks tip version
+    # install the weblocks development version
     bash install-weblocks.sh your-project-name tip
 
   - Compile and run the project:
 
-    cd your-project-name
-    script/server
+    cd your-project-name && script/server
 
 * Release Notes:
   - All dependencies are required by weblocks except for:
 
-    slime-2009-09-12.tar.gz
+    slime-2009-09-12.tar.gz (Swank is started by default on port 4005)
     osicat-0.6.0.tar.gz
     linedit-0.16.1.tar.gz
     terminfo-1.3.tar.gz
