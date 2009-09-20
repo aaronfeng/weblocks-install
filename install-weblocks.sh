@@ -8,7 +8,7 @@ set -e
 # enable for debugging
 # set -x
 
-if [ -z $1 ]
+if [ -z "$1" ]
 then
   echo -e "\033[31m Usage: $0 project-name stable-or-tip \033[0m"
   echo ""
@@ -30,7 +30,8 @@ WEBLOCKS_PACKAGE_URL="http://cloud.github.com/downloads/aaronfeng/weblocks-insta
 WEBLOCKS_PACKAGE="weblocks-0.8.3.tar.gz"
 WEBLOCKS_PUB=$LIB_SRC/weblocks-stable/pub
 
-if [ -n $2 ] && [ $2 == "tip" ]; then
+# for some reason -n doesn't work on Debian, so ! -z is used instead
+if [ ! -z "$2" ] && [ "$2" == "tip" ]; then
   echo "\033[33m Using the latest weblocks-dev \033[0m"
   WEBLOCKS_PACKAGE_URL="http://bitbucket.org/S11001001/weblocks-dev/get"
   WEBLOCKS_PACKAGE="tip.tar.gz"
