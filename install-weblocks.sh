@@ -30,7 +30,7 @@ WEBLOCKS_PACKAGE_URL="http://cloud.github.com/downloads/aaronfeng/weblocks-insta
 WEBLOCKS_PACKAGE="weblocks-0.8.3.tar.gz"
 WEBLOCKS_PUB=$LIB_SRC/weblocks-stable/pub
 
-# for some reason -n doesn't work on Debian, so ! -z is used instead
+# for some reason -n doesn't work on archlinux with bash v. 4.0.028, so ! -z is used instead
 if [ ! -z "$2" ] && [ "$2" == "tip" ]; then
   echo "\033[33m Using the latest weblocks-dev \033[0m"
   WEBLOCKS_PACKAGE_URL="http://bitbucket.org/S11001001/weblocks-dev/get"
@@ -227,7 +227,7 @@ then
 (format t "~C[2J~%" #\Esc)
 
 (format t "Welcome to weblocks~%")
-(format t "Weblocks is running on port ~S~%" *port*)
+(format t "Weblocks is running on port ~S, and can be access by browsing http://localhost:~S~%" *port* *port*)
 (format t "Swank is running on port ~S~%" *swank-port*)
 (format t "Use (quit) to exit REPL")
 (in-package $PROJECT_NAME)
@@ -303,5 +303,5 @@ echo -e "\033[32m If anything failed during the installation, it's safe to rerun
 echo ""
 echo -e "\033[32m Execute script/server in $PROJECT_NAME to compile and start up Weblocks.\033[0m"
 echo -e "\033[32m The $PROJECT_NAME project will be running on port 5555 and Swank on 4005 by default.\033[0m"
-echo -e "\033[32m Please update script/server to run on alternate ports.\033[0m"
+echo -e "\033[32m Please update script/server if you wish to run on alternate ports.\033[0m"
 echo -e "\033[32m Happy Hacking! \033[0m"
