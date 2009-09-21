@@ -1,13 +1,13 @@
-An idempotent self contained weblocks installation script for weblocks.
-The installation process will download stable version of weblocks (0.8.3),
-but an optional tip argument can be supplied to download the current
+An idempotent self contained weblocks (http://weblocks.viridian-project.de/)
+installation script.  The installation process will download a stable version of 
+weblocks (0.8.3), but an optional tip argument can be supplied to download the current
 development version.
 
 Swank is enabled by default, so one can connect to it from Emacs using
 Slime for interactive or remote development.
 
 The script attempts to be as idempotent as possible during the install, but
-more work might be required.  It should be consider safe to repeat the
+more work might be required.  It should be considered safe to repeat the
 script on an already created project.
 
 * Prerequsite:
@@ -17,16 +17,16 @@ script on an already created project.
   - Download and install all weblocks dependencies into the project:
 
     # install the weblocks stable version
-    bash install-weblocks.sh your-project-name-with-path
+    bash install-weblocks ~/path/to/your/project/foobar
 
     # or
 
     # install the weblocks development version
-    bash install-weblocks.sh your-project-name tip
+    bash install-weblocks ~/path/to/your/project/foobar tip
 
   - Compile and run the project:
 
-    cd your-project-name && script/server
+    cd ~/path/to/your/project/foobar && script/server
 
 * Release Notes:
   - All dependencies are required by weblocks except for:
