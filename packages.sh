@@ -49,5 +49,6 @@ linedit-0.16.1.tar.gz \
 osicat-0.6.0.tar.gz \
 terminfo-1.3.tar.gz \
 uffi-1.6.2.tar.gz \
-lift-1.7.0.tar.gz
+lift-1.7.0.tar.gz \
+html-template-0.9.1.tar.gz
 " 
