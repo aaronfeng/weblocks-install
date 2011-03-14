@@ -17,12 +17,12 @@ script on an already created project.
   - Download and install all weblocks dependencies into the project:
 
     # install the weblocks stable version
-    bash install-weblocks ~/path/to/your/project/foobar
+    bash install-weblocks.sh ~/path/to/your/project/foobar
 
     # or
 
     # install the weblocks development version
-    bash install-weblocks ~/path/to/your/project/foobar tip
+    bash install-weblocks.sh ~/path/to/your/project/foobar tip
 
   - Compile and run the project:
 
